@@ -56,11 +56,11 @@ public class Main {
             System.out.println("Совпадает с исходным: " + isSame(v, fromSer));
         }
 
-        System.out.println("==================Выше код предыдущей лабы======================");
         /*System.out.println("Введите транспортное средство (тип тс, марка, кол-во моделей, затем название и цена каждой модели):");
         Vehicle fromStdin = VehicleUtils.readVehicle(new InputStreamReader(System.in));
         System.out.println("Считано из System.in:");
         VehicleUtils.printModels(fromStdin);*/
+        System.out.println("==================Выше код предыдущей лабы======================");
         Vehicle auto = vehicles[0].clone();
         Vehicle moto = vehicles[1].clone();
         System.out.println("==================Проверки======================");
