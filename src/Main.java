@@ -2,12 +2,11 @@ import java.io.*;
 import java.util.Arrays;
 
 public class Main {
-    public static void main(String[] args) throws Exception {
+    static void main(String[] args) throws Exception {
         Vehicle[] vehicles = {
                 new Auto("Lada", 3),
                 new Motorcycle("Honda", 4)
         };
-        String[] types = {Auto.class.getName(), Motorcycle.class.getName()};
 
         for (int k = 0; k < vehicles.length; k++) {
             Vehicle v = vehicles[k];
@@ -65,14 +64,14 @@ public class Main {
         Vehicle moto = vehicles[1].clone();
         System.out.println("==================Проверки======================");
         System.out.println("Авто хэш " + vehicles[0].hashCode());
-        System.out.println(vehicles[0].toString());
+        System.out.println(vehicles[0]);
         System.out.println("Мото хэш " + vehicles[1].hashCode());
-        System.out.println(vehicles[1].toString());
+        System.out.println(vehicles[1]);
         System.out.println("Авто клон хэш " + auto.hashCode());
-        System.out.println("Клон авто " + auto.toString());
+        System.out.println("Клон авто " + auto);
         System.out.println("Сравнение клона и орига авто " + auto.equals(vehicles[0]));
         System.out.println("Сравнение хэшей клона и орига авто " + (vehicles[0].hashCode() == auto.hashCode()));
-        System.out.println("Клон мото " + moto.toString());
+        System.out.println("Клон мото " + moto);
         System.out.println("Мото клон хэш " + moto.hashCode());
         System.out.println("Сравнение клона и орига мото " + moto.equals(vehicles[1]));
         System.out.println("Сравнение хэшей клона и орига мото " + (vehicles[1].hashCode() == moto.hashCode()));
@@ -80,14 +79,14 @@ public class Main {
         vehicles[0].addNewModel("MARK", 23525.343);
         vehicles[1].addNewModel("MARK", 23525.343);
         System.out.println("Авто хэш " + vehicles[0].hashCode());
-        System.out.println(vehicles[0].toString());
+        System.out.println(vehicles[0]);
         System.out.println("Мото хэш " + vehicles[1].hashCode());
-        System.out.println(vehicles[1].toString());
+        System.out.println(vehicles[1]);
         System.out.println("Авто клон хэш " + auto.hashCode());
-        System.out.println("Клон авто " + auto.toString());
+        System.out.println("Клон авто " + auto);
         System.out.println("Сравнение клона и орига авто " + auto.equals(vehicles[0]));
         System.out.println("Сравнение хэшей клона и орига авто " + (vehicles[0].hashCode() == auto.hashCode()));
-        System.out.println("Клон мото " + moto.toString());
+        System.out.println("Клон мото " + moto);
         System.out.println("Мото клон хэш " + moto.hashCode());
         System.out.println("Сравнение клона и орига мото " + moto.equals(vehicles[1]));
         System.out.println("Сравнение хэшей клона и орига мото " + (vehicles[1].hashCode() == moto.hashCode()));
