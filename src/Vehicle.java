@@ -1,4 +1,6 @@
-public interface Vehicle {
+import java.io.Serializable;
+
+public interface Vehicle extends Serializable{
     String getMark();
     void setMark(String mark);
 
@@ -12,4 +14,5 @@ public interface Vehicle {
     void removeOldModel(String modelName) throws NoSuchModelNameException;
     void setModelName(String oldName, String newName) throws NoSuchModelNameException, DuplicateModelNameException;
     int getModelsLength();
+    Vehicle clone();
 }

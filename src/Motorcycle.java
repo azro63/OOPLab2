@@ -1,10 +1,16 @@
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Objects;
 
-public class Motorcycle implements Vehicle {
+public class Motorcycle implements Vehicle, Cloneable{
+
     private String mark;
     private int size = 0;
     private Model head;
-    private long lastModified;
+    private transient long lastModified;
 
     public Motorcycle(String mark, int size) {
         this.mark = mark;
@@ -119,14 +125,16 @@ public class Motorcycle implements Vehicle {
         m.setName(newName);
     }
 
-    private class Model {
+
+
+    private static class Model implements Serializable, Cloneable {
         String name = null;
         double cost = Double.NaN;
         Model prev = null;
         Model next = null;
 
         public Model(String name, double cost) { this.name = name; setCost(cost); }
-        public Model() { this.setPrev(this); this.setNext(this); } // head
+        public Model() { this.setPrev(this); this.setNext(this);} // head
 
         public void setName(String name) { this.name = name; }
         public String getName() { return name; }
@@ -140,5 +148,91 @@ public class Motorcycle implements Vehicle {
         public Model getNext() { return next; }
         public void setPrev(Model prev) { this.prev = prev; }
         public Model getPrev() { return prev; }
+        @Override
+        public Model clone()
+        {
+            try
+            {
+                Model copy = (Model) super.clone();
+                copy.prev = null;
+                copy.next = null;
+                return copy;
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+    @Override
+    public String toString()
+    {
+        StringBuffer sb = new StringBuffer();
+        sb.append("mark='")
+                .append(mark)
+                .append("', models=[");
+        Model p = head.getNext();
+        while(p != head)
+        {
+            if(p != head.getNext()) { sb.append(", "); }
+            sb.append("{name=")
+                    .append(p.getName())
+                    .append("} {cost=")
+                    .append(p.getCost())
+                    .append("}");
+            p = p.getNext();
+        }
+        sb.append("]}");
+        return sb.toString();
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Vehicle)) return false;
+        Vehicle other = (Vehicle) obj;
+        if (!Objects.equals(mark, other.getMark())) return false;
+        if (getModelsLength() != other.getModelsLength()) return false;
+
+        String[] names1 = getModelsNames();
+        String[] names2 = other.getModelsNames();
+        double[] costs1 = getModelsCosts();
+        double[] costs2 = other.getModelsCosts();
+
+        for (int i = 0; i < names1.length; i++) {
+            if (!Objects.equals(names1[i], names2[i]) || costs1[i] != costs2[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+    @Override
+    public int hashCode(){
+        int result = Objects.hashCode(mark);
+        Model p = head.getNext();
+        while(p != head){
+            result = 97 * result + Objects.hashCode(p.getName());
+            result = 97 * result + Double.hashCode(p.getCost());
+            p = p.getNext();
+        }
+        return result;
+    }
+    @Override
+    public Motorcycle clone()
+    {
+        try {
+            Motorcycle copiedMoto = (Motorcycle) super.clone();
+            copiedMoto.size = 0;
+            if(this.head == null){
+                copiedMoto.head = null;
+                return copiedMoto;
+            }
+            copiedMoto.head = new Model();
+            Model p = head.getNext();
+            while(p != head) {
+                copiedMoto.addNewModel(p.getName(), p.getCost());
+                p = p.getNext();
+            }
+            return copiedMoto;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

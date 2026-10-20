@@ -1,6 +1,9 @@
+import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Objects;
 
-public class Auto implements Vehicle {
+public class Auto implements Vehicle, Cloneable {
+
     private String mark;
     private Model[] models;
 
@@ -91,7 +94,7 @@ public class Auto implements Vehicle {
         models[index].setName(newName);
     }
 
-    private class Model {
+    private static class Model implements Serializable, Cloneable {
         private String name;
         private double cost;
         public Model(String name, double cost) { this.name = name; setCost(cost); }
@@ -102,5 +105,82 @@ public class Auto implements Vehicle {
 
             this.cost = cost;
         }
+        @Override
+        public Model clone()
+        {
+            try
+            {
+                return (Model) super.clone();
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @Override
+    public String toString()
+    {
+        StringBuffer sb = new StringBuffer();
+        sb.append("mark='")
+                .append(mark)
+                .append("', models=[");
+        for(int i = 0; i < models.length; i++)
+        {
+            if(i > 0) { sb.append(", "); }
+            sb.append("{name=")
+                    .append(models[i].getName())
+                    .append("} {cost=")
+                    .append(models[i].getCost())
+                    .append("}");
+        }
+        sb.append("]}");
+        return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Vehicle)) return false;
+        Vehicle other = (Vehicle) obj;
+        if (!Objects.equals(mark, other.getMark())) return false;
+        if (getModelsLength() != other.getModelsLength()) return false;
+
+        String[] names1 = getModelsNames();
+        String[] names2 = other.getModelsNames();
+        double[] costs1 = getModelsCosts();
+        double[] costs2 = other.getModelsCosts();
+
+        for (int i = 0; i < names1.length; i++) {
+            if (!Objects.equals(names1[i], names2[i]) || Double.compare(costs1[i], costs2[i]) != 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+    @Override
+    public int hashCode(){
+        int result = Objects.hashCode(mark);
+        for(Model m : models) {
+            result = 97 * result + Objects.hashCode(m.getName());
+            result = 97 * result + Double.hashCode(m.getCost());
+        }
+        return result;
+    }
+    @Override
+    public Auto clone()
+    {
+        Auto copiedAuto = null;
+        try {
+            copiedAuto = (Auto) super.clone();
+            copiedAuto.models = new Model[models.length];
+            for(int i = 0; i < models.length; i++)
+            {
+                copiedAuto.models[i] = models[i].clone();
+            }
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+
+        return copiedAuto;
     }
 }
