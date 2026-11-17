@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class Motorcycle implements Vehicle, Cloneable{
+public class Motorcycle implements Vehicle{
 
     private String mark;
     private int size = 0;
@@ -208,14 +208,14 @@ public class Motorcycle implements Vehicle, Cloneable{
         int result = Objects.hashCode(mark);
         Model p = head.getNext();
         while(p != head){
-            result = 97 * result + Objects.hashCode(p.getName());
-            result = 97 * result + Double.hashCode(p.getCost());
+            result = 31 * result + Objects.hashCode(p.getName());
+            result = 31 * result + Double.hashCode(p.getCost());
             p = p.getNext();
         }
         return result;
     }
     @Override
-    public Motorcycle clone()
+    public Vehicle clone()
     {
         try {
             Motorcycle copiedMoto = (Motorcycle) super.clone();

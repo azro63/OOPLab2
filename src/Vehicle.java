@@ -1,6 +1,6 @@
 import java.io.Serializable;
 
-public interface Vehicle extends Serializable{
+public interface Vehicle extends Serializable, Cloneable{
     String getMark();
     void setMark(String mark);
 

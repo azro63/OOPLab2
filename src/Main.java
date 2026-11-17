@@ -1,31 +1,33 @@
 import java.io.*;
-import java.util.Arrays;
+import java.lang.reflect.*;
 
 public class Main {
-    static void main(String[] args) throws Exception {
+
+    public static void main(String[] args) throws Exception {
+        System.out.println("==================Задание 1 (рефлексия)======================");
+        if (args.length >= 2) {
+            callMethod(args);
+        } else {
+            System.out.println("Параметры: класс метод [параметры метода]");
+            System.out.println("Пример: Auto setModelCost model1 5000");
+        }
+
         Vehicle[] vehicles = {
                 new Auto("Lada", 3),
-                new Motorcycle("Honda", 4)
+                new Motorcycle("Honda", 4),
+                new Scooter("Yamaha", 3),
+                new Quadbike("Polaris", 2),
+                new Moped("Alpha", 3)
         };
 
         for (int k = 0; k < vehicles.length; k++) {
             Vehicle v = vehicles[k];
             System.out.println("========================================");
             VehicleUtils.printModels(v);
-            VehicleUtils.printModelCosts(v);
             VehicleUtils.printAverageModelCost(v);
 
-            String binFile = "vehicle" + k + ".bin";
-            try (FileOutputStream fos = new FileOutputStream(binFile)) {
-                VehicleUtils.outputVehicle(v, fos);
-            }
-            Vehicle fromBin;
-            try (FileInputStream fis = new FileInputStream(binFile)) {
-                fromBin = VehicleUtils.inputVehicle(fis);
-            }
-            System.out.println("(Байтовый поток) прочитано из файла " + binFile + ":");
-            VehicleUtils.printModels(fromBin);
-            System.out.println("Совпадает с исходным: " + isSame(v, fromBin));
+            Vehicle created = VehicleUtils.createVehicle("Test", 2, v);
+            System.out.println("Задание 2, создан через рефлексию: " + created);
 
             String txtFile = "vehicle" + k + ".txt";
             try (FileWriter fw = new FileWriter(txtFile)) {
@@ -35,66 +37,73 @@ public class Main {
             try (FileReader fr = new FileReader(txtFile)) {
                 fromTxt = VehicleUtils.readVehicle(fr);
             }
-            System.out.println("(Символьный поток) прочитано из файла " + txtFile + ":");
-            VehicleUtils.printModels(fromTxt);
-            System.out.println("Совпадает с исходным: " + isSame(v, fromTxt));
+            System.out.println("Задание 7, прочитано из файла " + txtFile + ": " + fromTxt);
+            System.out.println("Совпадает с исходным: " + v.equals(fromTxt));
 
-            System.out.println("(System.out) запись символьным потоком:");
-            VehicleUtils.writeVehicle(v, new OutputStreamWriter(System.out));
-
-            String serFile = "vehicleSer" + k + ".txt";
-            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(serFile))) {
-                oos.writeObject(v);
-            }
-            Vehicle fromSer;
-            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(serFile))) {
-                fromSer = (Vehicle) ois.readObject();
-            }
-            System.out.println("(Сериализация) прочитано из файла " + serFile + ":");
-            VehicleUtils.printModels(fromSer);
-            System.out.println("Совпадает с исходным: " + isSame(v, fromSer));
+            Vehicle copy = v.clone();
+            System.out.println("Клон равен оригиналу: " + v.equals(copy));
+            copy.setModelCost(copy.getModelsNames()[0], 1.5);
+            System.out.println("После изменения клона равен оригиналу: " + v.equals(copy));
         }
 
-        /*System.out.println("Введите транспортное средство (тип тс, марка, кол-во моделей, затем название и цена каждой модели):");
-        Vehicle fromStdin = VehicleUtils.readVehicle(new InputStreamReader(System.in));
-        System.out.println("Считано из System.in:");
-        VehicleUtils.printModels(fromStdin);*/
-        System.out.println("==================Выше код предыдущей лабы======================");
-        Vehicle auto = vehicles[0].clone();
-        Vehicle moto = vehicles[1].clone();
-        System.out.println("==================Проверки======================");
-        System.out.println("Авто хэш " + vehicles[0].hashCode());
-        System.out.println(vehicles[0]);
-        System.out.println("Мото хэш " + vehicles[1].hashCode());
-        System.out.println(vehicles[1]);
-        System.out.println("Авто клон хэш " + auto.hashCode());
-        System.out.println("Клон авто " + auto);
-        System.out.println("Сравнение клона и орига авто " + auto.equals(vehicles[0]));
-        System.out.println("Сравнение хэшей клона и орига авто " + (vehicles[0].hashCode() == auto.hashCode()));
-        System.out.println("Клон мото " + moto);
-        System.out.println("Мото клон хэш " + moto.hashCode());
-        System.out.println("Сравнение клона и орига мото " + moto.equals(vehicles[1]));
-        System.out.println("Сравнение хэшей клона и орига мото " + (vehicles[1].hashCode() == moto.hashCode()));
-        System.out.println("==================Проверка на правильное копирование======================");
-        vehicles[0].addNewModel("MARK", 23525.343);
-        vehicles[1].addNewModel("MARK", 23525.343);
-        System.out.println("Авто хэш " + vehicles[0].hashCode());
-        System.out.println(vehicles[0]);
-        System.out.println("Мото хэш " + vehicles[1].hashCode());
-        System.out.println(vehicles[1]);
-        System.out.println("Авто клон хэш " + auto.hashCode());
-        System.out.println("Клон авто " + auto);
-        System.out.println("Сравнение клона и орига авто " + auto.equals(vehicles[0]));
-        System.out.println("Сравнение хэшей клона и орига авто " + (vehicles[0].hashCode() == auto.hashCode()));
-        System.out.println("Клон мото " + moto);
-        System.out.println("Мото клон хэш " + moto.hashCode());
-        System.out.println("Сравнение клона и орига мото " + moto.equals(vehicles[1]));
-        System.out.println("Сравнение хэшей клона и орига мото " + (vehicles[1].hashCode() == moto.hashCode()));
+        System.out.println("==================Задание 6 (среднее)======================");
+        System.out.println("По всем ТС: " + VehicleUtils.getAverageModelCost(vehicles));
+        System.out.println("По двум ТС: " + VehicleUtils.getAverageModelCost(vehicles[0], vehicles[2]));
+        System.out.println("Без аргументов: " + VehicleUtils.getAverageModelCost());
+
+        System.out.println("==================System.out (printf)======================");
+        VehicleUtils.writeVehicle(vehicles[2], new OutputStreamWriter(System.out));
     }
 
-    private static boolean isSame(Vehicle a, Vehicle b) {
-        return a.getMark().equals(b.getMark())
-                && Arrays.equals(a.getModelsNames(), b.getModelsNames())
-                && Arrays.equals(a.getModelsCosts(), b.getModelsCosts());
+    private static void callMethod(String[] args) {
+        try {
+            Class<?> c = Class.forName(args[0]);
+            Constructor<?> constructor = c.getConstructor(String.class, int.class);
+            Object obj = constructor.newInstance("Lada", 3);
+            System.out.println("До вызова: " + obj);
+
+            Method method = null;
+            Method[] methods = c.getMethods();
+            for (int i = 0; i < methods.length; i++) {
+                if (methods[i].getName().equals(args[1])
+                        && methods[i].getParameterTypes().length == args.length - 2) {
+                    method = methods[i];
+                }
+            }
+            if (method == null) {
+                System.out.println("Метод не найден");
+                return;
+            }
+
+            Class<?>[] types = method.getParameterTypes();
+            Object[] params = new Object[types.length];
+            for (int i = 0; i < types.length; i++) {
+                if (types[i] == double.class) {
+                    params[i] = Double.valueOf(args[i + 2]);
+                } else if (types[i] == int.class) {
+                    params[i] = Integer.valueOf(args[i + 2]);
+                } else {
+                    params[i] = args[i + 2];
+                }
+            }
+
+            Object res = method.invoke(obj, params);
+            if (res != null) {
+                System.out.println("Результат: " + res);
+            }
+            System.out.println("После вызова: " + obj);
+        } catch (ClassNotFoundException e) {
+            System.out.println("Класс не найден");
+        } catch (NoSuchMethodException e) {
+            System.out.println("Нет конструктора с параметрами String и int");
+        } catch (InstantiationException e) {
+            System.out.println("Не удалось создать объект");
+        } catch (IllegalAccessException e) {
+            System.out.println("Метод недоступен");
+        } catch (InvocationTargetException e) {
+            System.out.println("При вызове возникло исключение: " + e.getCause().getMessage());
+        } catch (NumberFormatException e) {
+            System.out.println("Неверный формат числа");
+        }
     }
 }

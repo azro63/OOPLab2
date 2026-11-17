@@ -2,7 +2,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class Auto implements Vehicle, Cloneable {
+public class Auto implements Vehicle {
 
     private String mark;
     private Model[] models;
@@ -151,7 +151,7 @@ public class Auto implements Vehicle, Cloneable {
         double[] costs2 = other.getModelsCosts();
 
         for (int i = 0; i < names1.length; i++) {
-            if (!Objects.equals(names1[i], names2[i]) || Double.compare(costs1[i], costs2[i]) != 0) {
+            if (!Objects.equals(names1[i], names2[i]) || costs1[i] != costs2[i]) {
                 return false;
             }
         }
@@ -161,13 +161,13 @@ public class Auto implements Vehicle, Cloneable {
     public int hashCode(){
         int result = Objects.hashCode(mark);
         for(Model m : models) {
-            result = 97 * result + Objects.hashCode(m.getName());
-            result = 97 * result + Double.hashCode(m.getCost());
+            result = 31 * result + Objects.hashCode(m.getName());
+            result = 31 * result + Double.hashCode(m.getCost());
         }
         return result;
     }
     @Override
-    public Auto clone()
+    public Vehicle clone()
     {
         Auto copiedAuto = null;
         try {

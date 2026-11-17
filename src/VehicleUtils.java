@@ -1,24 +1,37 @@
 import java.io.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Locale;
+import java.util.Scanner;
 
 public class VehicleUtils {
 
-    public static double getAverageModelCost(Vehicle vehicle) {
-        double[] costs = vehicle.getModelsCosts();
-        if (costs.length == 0) {
+    public static double getAverageModelCost(Vehicle... vehicles) {
+        double sum = 0;
+        int count = 0;
+        for (Vehicle vehicle : vehicles) {
+            for (double cost : vehicle.getModelsCosts()) {
+                sum += cost;
+                count++;
+            }
+        }
+        if (count == 0) {
             return 0;
         }
-        double sum = 0;
-        for (double cost : costs) {
-            sum += cost;
-        }
-        return sum / costs.length;
+        return sum / count;
     }
 
     public static void printModels(Vehicle vehicle) {
-        if(vehicle.getClass().getName().equals(Auto.class.getName())) {
+        if (vehicle instanceof Auto) {
             System.out.println("Автомобиль: " + vehicle.getMark());
-        }else if(vehicle.getClass().getName().equals(Motorcycle.class.getName())) {
+        } else if (vehicle instanceof Motorcycle) {
             System.out.println("Мотоцикл: " + vehicle.getMark());
+        } else if (vehicle instanceof Scooter) {
+            System.out.println("Скутер: " + vehicle.getMark());
+        } else if (vehicle instanceof Quadbike) {
+            System.out.println("Квадроцикл: " + vehicle.getMark());
+        } else if (vehicle instanceof Moped) {
+            System.out.println("Мопед: " + vehicle.getMark());
         }
         String[] names = vehicle.getModelsNames();
         double[] costs = vehicle.getModelsCosts();
@@ -96,37 +109,57 @@ public class VehicleUtils {
         PrintWriter pw = new PrintWriter(out);
         String[] names = v.getModelsNames();
         double[] costs = v.getModelsCosts();
-        pw.println(v.getClass().getName());
-        pw.println(v.getMark());
-        pw.println(names.length);
+        pw.printf("%s %s %d%n", v.getClass().getName(), v.getMark(), names.length);
         for (int i = 0; i < names.length; i++) {
-            pw.println(names[i]);
-            pw.println(costs[i]);
+            pw.printf("%s %s%n", names[i], costs[i]);
         }
         pw.flush();
     }
 
     public static Vehicle readVehicle(Reader in) throws IOException, DuplicateModelNameException {
-        BufferedReader br = new BufferedReader(in);
-        String classType = br.readLine();
-        String mark = br.readLine();
-        int n = Integer.parseInt(br.readLine().trim());
+        Scanner sc = new Scanner(in);
+        sc.useLocale(Locale.US);
+        String classType = sc.next();
+        String mark = sc.next();
+        int n = sc.nextInt();
         Vehicle v = createVehicle(mark, classType);
         for (int i = 0; i < n; i++) {
-            String model = br.readLine();
-            double cost = Double.parseDouble(br.readLine().trim());
+            String model = sc.next();
+            double cost = sc.nextDouble();
             v.addNewModel(model, cost);
         }
         return v;
     }
 
+    public static Vehicle createVehicle(String mark, int length, Vehicle vehicle) {
+        Class<? extends Vehicle> c = vehicle.getClass();
+        try {
+            Constructor<? extends Vehicle> constructor = c.getConstructor(String.class, int.class);
+            return constructor.newInstance(mark, length);
+        } catch (NoSuchMethodException e) {
+            return null;
+        } catch (InstantiationException e) {
+            return null;
+        } catch (IllegalAccessException e) {
+            return null;
+        } catch (InvocationTargetException e) {
+            return null;
+        }
+    }
+
     private static Vehicle createVehicle(String mark, String classType) throws IOException {
         Vehicle v = null;
-        if(classType.equals(Auto.class.getName())) {
+        if (classType.equals(Auto.class.getName())) {
             v = new Auto(mark, 0);
         } else if (classType.equals(Motorcycle.class.getName())) {
             v = new Motorcycle(mark, 0);
-        }else{
+        } else if (classType.equals(Scooter.class.getName())) {
+            v = new Scooter(mark, 0);
+        } else if (classType.equals(Quadbike.class.getName())) {
+            v = new Quadbike(mark, 0);
+        } else if (classType.equals(Moped.class.getName())) {
+            v = new Moped(mark, 0);
+        } else {
             throw new IOException("Неверно указан тип ТС");
         }
         return v;
